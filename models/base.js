@@ -42,7 +42,6 @@ export class Base {
             .join(', ');
 
         const sql = `UPDATE ${this.table} SET ${setStatements} WHERE ${whereConditions}`;
-        console.log(sql)
        return  db.prepare(sql).run();
     }
 

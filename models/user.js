@@ -1,10 +1,11 @@
 import { Base } from "./base.js";
-
+import db from './init.js'
 class User extends Base{
-    constructor(){
-        super()
-        this.table = "users"
-    }
+   table = 'users'
+
+   fullText(text){
+        return db.prepare(`SELECT * FROM users where name like '${text}%' `).all()
+   }
 
 }
 

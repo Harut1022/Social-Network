@@ -8,7 +8,9 @@ db.exec(`
         surname TEXT,
         login TEXT,
         password TEXT,
-        picture TEXT
+        isPrivate INTEGER DEFAULT 0,
+        cover TEXT,
+        picture TEXT    
     )
 `)
 
@@ -21,4 +23,54 @@ db.exec(`
     )    
 `)
 
+
+db.exec(`
+    CREATE TABLE IF NOT EXISTS POSTS(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT,
+        picture TEXT,
+        userId INTEGER,
+        FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
+    )
+`)
+
+db.exec(`
+    CREATE TABLE IF NOT EXISTS comments(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        content TEXT,
+        postId INTEGER,
+        userId INTEGER,
+        FOREIGN KEY(postId) REFERENCES posts(id) ON DELETE CASCADE
+        FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
+    )
+`)
+db.exec(`
+    CREATE TABLE IF NOT EXISTS likes(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        postId INTEGER,
+        userId INTEGER,
+        FOREIGN KEY(postId) REFERENCES posts(id) ON DELETE CASCADE
+        FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
+    )
+`)
+
+db.exec(`
+    CREATE TABLE IF NOT EXISTS follows(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        userId INTEGER,
+        follows INTEGER,
+        FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
+        FOREIGN KEY(follows) REFERENCES users(id) ON DELETE CASCADE
+    )    
+`)
+db.exec(`
+    CREATE TABLE IF NOT EXISTS requests(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        userId INTEGER,
+        requests INTEGER,
+        accepted INTEGER DEFAULT 0,
+        FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
+        FOREIGN KEY(requests) REFERENCES users(id) ON DELETE CASCADE
+    )    
+`)
 export default db

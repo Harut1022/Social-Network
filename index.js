@@ -49,7 +49,7 @@ app.get('/', (req, res) => {
 
 app.get('/db/:table?', (req, res) => {
   const {table} = req.params
-  const tables = ['users',    'session']
+  const tables = ['users','session', 'posts','comments', 'likes', 'follows','requests']
   let columns = []
   let data = []
 
@@ -80,6 +80,10 @@ app.get('/db/:table/:id', (req, res)=> {
 
 app.use('/', apiRoutes);
 
+app.use((err, req, res, next) => {
+  console.error('Error occurred:', err.message);
+  res.status(500).json({ message: 'Internal Server Error' });
+});
 
 // Start the server
 app.listen(port, () => {
