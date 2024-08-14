@@ -278,7 +278,7 @@ router.post('/posts/react/:id', authMiddleware, privateProfile,  postController.
  *         description: <code>{status:string,message?:string, payload:IComment}</code>
  *       
  */
-router.post('/posts/comment/:id', authMiddleware, privateProfile,  postController.reactPost)
+router.post('/posts/comment/:id', authMiddleware, privateProfile,  postController.addComment)
 
 /**
  * @swagger
