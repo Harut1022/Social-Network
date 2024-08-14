@@ -1,4 +1,6 @@
 import postModel from '../models/post.js'
+import likesModel from '../models/likes.js'
+import userModel from '../models/user.js'
 class PostController{
 
     addHandler(req, res){
@@ -18,7 +20,15 @@ class PostController{
 
     getAll(req,res){
         const user = req.user.id
-        const posts = postModel.findWhere({userId:user})
+        const posts = postModel
+                      .findWhere({userId:user})
+                      .map(post => {
+                        post.likes = likesModel
+                                     .findWhere({postId:post.id})
+                                     .map(like => like.userId)
+                                     .map(id => userModel.findOne({id}).omit('login', 'password'))
+                        return post
+                      })
         return res.send({status:'ok', payload:posts})
     }
 
@@ -35,6 +45,23 @@ class PostController{
 
         postModel.delete({id})
         return res.send({status:'ok', payload:id})
+    }
+
+    reactPost(req, res){
+        const {id} = req.params
+        const me = req.user.id
+
+        const descriptor = {postId:id, userId:me}
+        let found = likesModel.findOne(descriptor)
+        if(!found){
+            likesModel.insert(descriptor)
+            return res.send({status:'ok', payload:'liked'})
+        }else{
+            likesModel.delete(descriptor)
+            return res.send({status:'ok', payload:'unliked'})
+
+        }
+
     }
 }
 

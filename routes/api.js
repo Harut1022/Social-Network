@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import userController from '../controllers/user.js'
 import postController from '../controllers/post.js'
-import { authMiddleware } from '../lib/middleware.js';
+import { authMiddleware, privateProfile } from '../lib/middleware.js';
 import multer from 'multer'
 import { nanoid } from 'nanoid';
 const router = Router();
@@ -230,6 +230,55 @@ router.patch('/cover/upload', authMiddleware, upload.single('cover'),  userContr
  */
 router.post('/posts', authMiddleware, upload.single('photo'),  postController.addHandler)
 
+/**
+ * @swagger
+ * /posts/react/:id:
+ *   post:
+ *     summary: like/unlike a post
+ *     description: 
+ *     tags:
+ *       - Resource
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               photo:
+ *                 type: File
+ *               content:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: <code>{status:string,message?:string}</code>
+ *       
+ */
+router.post('/posts/react/:id', authMiddleware, privateProfile,  postController.reactPost)
+
+/**
+ * @swagger
+ * /posts/comment/:id:
+ *   post:
+ *     summary: like/unlike a post
+ *     description: 
+ *     tags:
+ *       - Resource
+ *     requestBody:
+ *       required: true
+ *       content:
+ *        application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               text:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: <code>{status:string,message?:string, payload:IComment}</code>
+ *       
+ */
+router.post('/posts/comment/:id', authMiddleware, privateProfile,  postController.reactPost)
 
 /**
  * @swagger
