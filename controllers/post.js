@@ -16,7 +16,7 @@ class PostController {
         }
         const row = postModel.insert(post)
 
-        res.send({ status: 'ok', message: 'cover uploaded successfully', payload: { ...post, id: row.lastInsertRowid } })
+        res.send({ status: 'ok', message: 'cover uploaded successfully', payload: { ...post, id: row.lastInsertRowid, likes:[] } })
     }
 
     getAll(req, res) {
