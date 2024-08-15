@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt'
 import postModel from '../models/post.js'
 import followModel from '../models/follow.js'
 import requestModel from '../models/request.js'
+import { loadUser } from '../lib/helpers.js'
 
 
 class UserController {
@@ -156,6 +157,9 @@ class UserController {
         let result = userModel.findOne({ id })
         const user = req.user.id
 
+        if(user == id){
+            return res.send({status:'error', message:'you can not observe your own account'})
+        }
         if (result) {
             const amIFollowing = followModel.findOne({ userId: user, follows: id })
             const followsMe = followModel.findOne({ userId: id, follows: user })
@@ -272,11 +276,20 @@ class UserController {
         return res.send({status:'ok', payload:all})
     }
     getFollowers(req, res){
-
+        const {id} = req.user
+        const followers = followModel
+                         .findWhere({follows:id})
+                         .map(loadUser)
+        return res.send({status:'ok', payload:followers})
     }
 
     getFollowings(req, res){
-
+        const {id} = req.user
+        const followers = followModel
+                         .findWhere({userId:id})
+                         .map(x => loadUser(x, 'follows'))  
+        
+        return res.send({status:'ok', payload:followers})
     }
 }
 

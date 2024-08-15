@@ -225,7 +225,7 @@ router.patch('/cover/upload', authMiddleware, upload.single('cover'),  userContr
  * 
  *     responses:
  *       200:
- *         description: <code>{status:string,message?:string, payload:string}</code>
+ *         description: <code>{status:string,message?:string, payload:IPost}</code>
  *       
  */
 router.post('/posts', authMiddleware, upload.single('photo'),  postController.addHandler)
@@ -238,17 +238,6 @@ router.post('/posts', authMiddleware, upload.single('photo'),  postController.ad
  *     description: 
  *     tags:
  *       - Resource
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               photo:
- *                 type: File
- *               content:
- *                 type: string
  *     responses:
  *       200:
  *         description: <code>{status:string,message?:string}</code>
@@ -260,7 +249,7 @@ router.post('/posts/react/:id', authMiddleware, privateProfile,  postController.
  * @swagger
  * /posts/comment/:id:
  *   post:
- *     summary: like/unlike a post
+ *     summary: add comment to the post 
  *     description: 
  *     tags:
  *       - Resource
@@ -282,6 +271,21 @@ router.post('/posts/comment/:id', authMiddleware, privateProfile,  postControlle
 
 /**
  * @swagger
+ * /posts/comment/:id:
+ *   delete:
+ *     summary: deletes a comment from the spost
+ *     description: 
+ *     tags:
+ *       - Resource
+ *     responses:
+ *       200:
+ *         description: <code>{status:string,message?:string}</code>
+ *       
+ */
+router.delete('/posts/comment/:id', authMiddleware,  postController.handleDeleteComment)
+
+/**
+ * @swagger
  * /posts:
  *   get:
  *     summary: Retrieves all the posts of the current authenticated user
@@ -293,7 +297,19 @@ router.post('/posts/comment/:id', authMiddleware, privateProfile,  postControlle
  *         description: <code>{status:string, payload:IPost[]}</code>
  */
 router.get('/posts',authMiddleware, postController.getAll)
-
+/**
+ * @swagger
+ * /posts/:id:
+ *   get:
+ *     summary: Retrieves a post by its id
+ *     description: 
+ *     tags:
+ *       - Resource
+ *     responses:
+ *       200:
+ *         description: <code>{status:string, payload:IPost}</code>
+ */
+router.get('/posts/:id', authMiddleware, privateProfile, postController.getPost)
 /**
  * @swagger
  * /posts/:id:
@@ -422,10 +438,40 @@ router.patch('/requests/decline/:id', authMiddleware, userController.decline)
  *       - Resource
  *     responses:
  *       200:
- *         description: <code>{status:string,message?:string}</code>
+ *         description: <code>{status:string,payload:IUser[]}</code>
  *       
  */
 router.get('/requests', authMiddleware, userController.getRequests)
+
+/**
+ * @swagger
+ * /followers:
+ *   get:
+ *     summary: gets all the followers
+ *     description: 
+ *     tags:
+ *       - Resource
+ *     responses:
+ *       200:
+ *         description: <code>{status:string,payload:IUser[]}</code>
+ *       
+ */
+router.get('/followers', authMiddleware, userController.getFollowers)
+
+/**
+ * @swagger
+ * /following:
+ *   get:
+ *     summary: gets the list of the users whom the authenticated one follows
+ *     description: 
+ *     tags:
+ *       - Resource
+ *     responses:
+ *       200:
+ *         description: <code>{status:string,payload:IUser[]}</code>
+ *       
+ */
+router.get('/following', authMiddleware, userController.getFollowings)
 
 
 
