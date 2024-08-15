@@ -24,6 +24,7 @@ class PostController {
         const posts = postModel
             .findWhere({ userId: user })
             .map(e => ({ ...e, likes: e.likes.map(a => a.user) }))
+            .map(e => e.omit('userId','comments'))
 
         return res.send({ status: 'ok', payload: posts })
     }
