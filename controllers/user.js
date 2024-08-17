@@ -207,7 +207,7 @@ class UserController {
         }
 
         followModel.insert({ userId: user, follows: id })
-        return res.send({ status: 'following' })
+        return res.send({ status: 'following', payload:req.user.omit('login', 'password') })
 
 
     }
@@ -223,8 +223,21 @@ class UserController {
         }
 
         followModel.delete({ userId: user, follows: id })
-        return res.send({ status: 'ok' })
+        return res.send({ status: 'unfollowed', payload:req.user.omit('login', 'password') })
     
+    }
+
+    cancelRequest(req, res){
+        const {id} = req.params
+        const me = req.user.id
+
+        const found = requestModel.findOne({userId:me, requests:id})
+        if(!found){
+            return res.send({status:'error', message:'no such request'})
+        }else{
+             requestModel.delete({userId:me, requests:id})
+             return res.send({status:'cancelled' })
+        }
     }
 
     accept(req, res){

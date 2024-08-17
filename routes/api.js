@@ -377,7 +377,7 @@ router.get('/account/:id',authMiddleware, userController.getAccount)
  *       - Resource
  *     responses:
  *       200:
- *         description: <code>{status:string,message?:string}</code>
+ *         description: <code>{status:string,message?:string, payload:IUser}</code>
  *       
  */
 router.post('/account/follow/:id', authMiddleware,  userController.follow)
@@ -392,10 +392,25 @@ router.post('/account/follow/:id', authMiddleware,  userController.follow)
  *       - Resource
  *     responses:
  *       200:
- *         description: <code>{status:string,message?:string}</code>
+ *         description: <code>{status:string,message?:string, payload:IUser}</code>
  *       
  */
 router.post('/account/unfollow/:id', authMiddleware,  userController.unfollow)
+
+/**
+ * @swagger
+ * /request/cancel/:id:
+ *   delete:
+ *     summary: cancels the request
+ *     description: 
+ *     tags:
+ *       - Resource
+ *     responses:
+ *       200:
+ *         description: <code>{status:string,message?:string, payload:IUser}</code>
+ *       
+ */
+router.delete('/request/cancel/:id', authMiddleware,  userController.cancelRequest)
 
 /**
  * @swagger
