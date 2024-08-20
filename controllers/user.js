@@ -6,6 +6,7 @@ import postModel from '../models/post.js'
 import followModel from '../models/follow.js'
 import requestModel from '../models/request.js'
 import { loadUser } from '../lib/helpers.js'
+import likesModel from '../models/likes.js'
 
 
 class UserController {
@@ -183,7 +184,10 @@ class UserController {
                     .map(e => userModel.findOne({ id: e }).omit('login', 'password'))
 
 
-                result.posts = postModel.findWhere({ userId: id })
+                result.posts = postModel.findWhere({ userId: id }).map(e => {
+                    e.isLiked = Boolean(likesModel.findOne({userId:req.user.id, postId:e.id}))
+                    return e
+                })
             }
         }
         if (!result) {
