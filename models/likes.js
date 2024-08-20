@@ -8,8 +8,8 @@ class Likes extends Base{
         return super
             .findWhere(conditionals)
             .map(likes => {
-                likes.user = userModel.findOne({ id: likes.id }).omit('login', 'password')
-                return likes
+                let user = userModel.findOne({ id: likes.userId })?.omit('login', 'password')
+                return user
             })
     }
 

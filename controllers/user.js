@@ -174,6 +174,7 @@ class UserController {
             }
 
             if (!result.isPrivate || result.connection.following) {
+               
                result.followers = followModel
                     .findWhere({ follows: result.id })
                     .map(e => e.userId)
