@@ -23,8 +23,6 @@ class PostController {
         const user = req.user.id
         const posts = postModel
             .findWhere({ userId: user })
-            .map(e => ({ ...e, likes: e.likes.map(a => a.user) }))
-            .map(e => e.omit('userId','comments'))
 
         return res.send({ status: 'ok', payload: posts })
     }
@@ -64,6 +62,7 @@ class PostController {
         const { text } = req.body
         const comment = { content: text, userId: me, postId: id }
         const result = commentModel.insert(comment)
+        comment.user = userModel.findOne({id:comment.userId})
 
         return res.send({ status: 'ok', payload: { ...comment, id: result.lastInsertRowid } })
 
@@ -83,6 +82,7 @@ class PostController {
     getPost(req, res) {
         const { id } = req.params
         const post = postModel.findOne({ id })
+        
         return res.send({ status: 'ok', payload: post })
 
     }

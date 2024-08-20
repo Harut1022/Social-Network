@@ -11,6 +11,7 @@ class Post extends Base {
                 .map(post => {
                     post.likes = likesModel.findWhere({ postId: post.id })
                     post.comments = commentsModel.findWhere({ postId: post.id })
+
                     return post
                 })
     }
