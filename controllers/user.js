@@ -157,13 +157,13 @@ class UserController {
         let result = userModel.findOne({ id })
         const user = req.user.id
 
-        if(user == id){
-            return res.send({status:'error', message:'you can not observe your own account'})
+        if (user == id) {
+            return res.send({ status: 'error', message: 'you can not observe your own account' })
         }
         if (result) {
             const amIFollowing = followModel.findOne({ userId: user, follows: id })
             const followsMe = followModel.findOne({ userId: id, follows: user })
-            const requested = requestModel.findOne({userId:user, requests: id})
+            const requested = requestModel.findOne({ userId: user, requests: id })
             result = result.omit('login', 'password')
 
             result.connection = {
@@ -173,6 +173,16 @@ class UserController {
             }
 
             if (!result.isPrivate || result.connection.following) {
+               result.followers = followModel
+                    .findWhere({ follows: result.id })
+                    .map(e => e.userId)
+                    .map(e => userModel.findOne({ id: e }).omit('login', 'password'))
+                result.following = followModel
+                    .findWhere({ userId: result.id })
+                    .map(e => e.follows)
+                    .map(e => userModel.findOne({ id: e }).omit('login', 'password'))
+
+
                 result.posts = postModel.findWhere({ userId: id })
             }
         }
@@ -181,12 +191,12 @@ class UserController {
         }
         return res.send({ status: 'ok', payload: result })
     }
-    changeStatus(req,res){
+    changeStatus(req, res) {
         const user = req.user.id
-        const status = userModel.findOne({id:user}).isPrivate
-        userModel.update({id:user}, {isPrivate: 1 - status})
-        return res.send({status:'ok', payload: 1-status})
-        
+        const status = userModel.findOne({ id: user }).isPrivate
+        userModel.update({ id: user }, { isPrivate: 1 - status })
+        return res.send({ status: 'ok', payload: 1 - status })
+
     }
     follow(req, res) {
         const { id } = req.params
@@ -199,15 +209,15 @@ class UserController {
             return res.send({ status: 'error', message: 'already following' })
         }
 
-        const them = userModel.findOne({id})
-        if(them.isPrivate){
-            requestModel.insert({userId:user, requests:id})
+        const them = userModel.findOne({ id })
+        if (them.isPrivate) {
+            requestModel.insert({ userId: user, requests: id })
             return res.send({ status: 'requested' })
 
         }
 
         followModel.insert({ userId: user, follows: id })
-        return res.send({ status: 'following', payload:req.user.omit('login', 'password') })
+        return res.send({ status: 'following', payload: req.user.omit('login', 'password') })
 
 
     }
@@ -223,86 +233,86 @@ class UserController {
         }
 
         followModel.delete({ userId: user, follows: id })
-        return res.send({ status: 'unfollowed', payload:req.user.omit('login', 'password') })
-    
+        return res.send({ status: 'unfollowed', payload: req.user.omit('login', 'password') })
+
     }
 
-    cancelRequest(req, res){
-        const {id} = req.params
+    cancelRequest(req, res) {
+        const { id } = req.params
         const me = req.user.id
 
-        const found = requestModel.findOne({userId:me, requests:id})
-        if(!found){
-            return res.send({status:'error', message:'no such request'})
-        }else{
-             requestModel.delete({userId:me, requests:id})
-             return res.send({status:'cancelled' })
+        const found = requestModel.findOne({ userId: me, requests: id })
+        if (!found) {
+            return res.send({ status: 'error', message: 'no such request' })
+        } else {
+            requestModel.delete({ userId: me, requests: id })
+            return res.send({ status: 'cancelled' })
         }
     }
 
-    accept(req, res){
-        const {id} = req.params
+    accept(req, res) {
+        const { id } = req.params
         const user = req.user.id
 
-        const found = requestModel.findOne({id})
-        if(!found){
-            return res.send({status:'error', message:'no such request'})
+        const found = requestModel.findOne({ id })
+        if (!found) {
+            return res.send({ status: 'error', message: 'no such request' })
         }
 
-        if(found.requests != user){
-            return res.send({status:'error', message:'you do not have a right to accept this request'})
+        if (found.requests != user) {
+            return res.send({ status: 'error', message: 'you do not have a right to accept this request' })
         }
 
-        followModel.insert({userId: found.userId, follows: user})
-        requestModel.delete({id})
-        return res.send({status:'ok', message:'accepted'})
+        followModel.insert({ userId: found.userId, follows: user })
+        requestModel.delete({ id })
+        return res.send({ status: 'ok', message: 'accepted' })
     }
 
-    decline(req, res){
-        const {id} = req.params
+    decline(req, res) {
+        const { id } = req.params
         const user = req.user.id
 
-        const found = requestModel.findOne({id})
-        if(!found){
-            return res.send({status:'error', message:'no such request'})
+        const found = requestModel.findOne({ id })
+        if (!found) {
+            return res.send({ status: 'error', message: 'no such request' })
         }
 
-        if(found.requests != user){
-            return res.send({status:'error', message:'you do not have a right to decline this request'})
+        if (found.requests != user) {
+            return res.send({ status: 'error', message: 'you do not have a right to decline this request' })
         }
 
-        requestModel.delete({id})
-        return res.send({status:'ok', message:'declined'})
+        requestModel.delete({ id })
+        return res.send({ status: 'ok', message: 'declined' })
     }
 
-    getRequests(req, res){
+    getRequests(req, res) {
         const id = req.user.id
         const all = requestModel
-                    .findWhere({requests:id})
-                    .map(request => {
-                        return {
-                            id:request.id,
-                            user: userModel.findOne({id: request.userId}).omit('login', 'password')
-                        }
-                    })
-    
-        return res.send({status:'ok', payload:all})
+            .findWhere({ requests: id })
+            .map(request => {
+                return {
+                    id: request.id,
+                    user: userModel.findOne({ id: request.userId }).omit('login', 'password')
+                }
+            })
+
+        return res.send({ status: 'ok', payload: all })
     }
-    getFollowers(req, res){
-        const {id} = req.user
+    getFollowers(req, res) {
+        const { id } = req.user
         const followers = followModel
-                         .findWhere({follows:id})
-                         .map(loadUser)
-        return res.send({status:'ok', payload:followers})
+            .findWhere({ follows: id })
+            .map(loadUser)
+        return res.send({ status: 'ok', payload: followers })
     }
 
-    getFollowings(req, res){
-        const {id} = req.user
+    getFollowings(req, res) {
+        const { id } = req.user
         const followers = followModel
-                         .findWhere({userId:id})
-                         .map(x => loadUser(x, 'follows'))  
-        
-        return res.send({status:'ok', payload:followers})
+            .findWhere({ userId: id })
+            .map(x => loadUser(x, 'follows'))
+
+        return res.send({ status: 'ok', payload: followers })
     }
 }
 
