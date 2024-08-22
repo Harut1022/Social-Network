@@ -72,7 +72,7 @@ class PostController {
         const { id } = req.params
         const user = req.user.id
         const comment = commentModel.findOne({ id })
-        if (comment && comment.userId == user) {
+        if (comment && comment.user?.id == user) {
             commentModel.delete({ id })
             return res.send({ status: 'ok' })
         } else {
