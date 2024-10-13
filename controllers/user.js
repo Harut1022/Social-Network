@@ -170,7 +170,7 @@ class UserController {
             //block
             const amIBlocked = blockModel.findOne({ user: req.user.id, blocked: result.id })
             const heBlockedMe = blockModel.findOne({ user: result.id, blocked: req.user.id })
-            
+
 
             result = result.omit('login', 'password')
             result.available = true
@@ -193,9 +193,9 @@ class UserController {
                 posts: [],
                 available: false
             }
-            if(heBlockedMe){
-                return res.send({status:'ok', payload: blockedContent})
-            }   
+            if (heBlockedMe) {
+                return res.send({ status: 'ok', payload: blockedContent })
+            }
             if (!result.isPrivate || result.connection.following) {
 
                 result.followers = followModel
@@ -210,11 +210,19 @@ class UserController {
 
                 result.posts = postModel.findWhere({ userId: id }).map(e => {
                     e.isLiked = Boolean(likesModel.findOne({ userId: req.user.id, postId: e.id }))
+                    let title = e.title
+
+                    const hashtags = title.match(/#[\w]+/g) || [];
+                    e.hashtags = hashtags
+
+                    // Remove hashtag words from the original string
+                    // const cleanString = title.replace(/#[\w]+/g, '').trim();
+
                     return e
                 })
 
 
-                if (amIBlocked ) {
+                if (amIBlocked) {
                     result = blockedContent
                 }
             }
@@ -367,8 +375,8 @@ class UserController {
             const amIBlocked = blockModel.findOne({ user: req.user.id, blocked: result.id })
             const heBlockedMe = blockModel.findOne({ user: result.id, blocked: req.user.id })
 
-            if(heBlockedMe){
-                return res.send({status:'error', message:'you are blocked'})
+            if (heBlockedMe) {
+                return res.send({ status: 'error', message: 'you are blocked' })
             }
 
             result.available = true
@@ -376,8 +384,8 @@ class UserController {
                 following: Boolean(amIFollowing),
                 followsMe: Boolean(followsMe),
                 requested: Boolean(requested),
-                amIBlocked:Boolean(heBlockedMe),
-                didIBlock:Boolean(amIBlocked)
+                amIBlocked: Boolean(heBlockedMe),
+                didIBlock: Boolean(amIBlocked)
             }
 
             if (!result.isPrivate || result.connection.following) {

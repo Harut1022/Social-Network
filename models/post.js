@@ -1,6 +1,7 @@
 import { Base } from "./base.js";
 import commentsModel from "./comments.js";
 import likesModel from "./likes.js";
+import db from './init.js';
 
 class Post extends Base {
     table = "posts"
@@ -14,6 +15,11 @@ class Post extends Base {
 
                     return post
                 })
+    }
+
+    findByHash(hash){
+        
+        return db.prepare(`SELECT * FROM posts where title like '%${hash}%'`).all()
     }
 }
 

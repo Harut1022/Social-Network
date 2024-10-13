@@ -86,6 +86,13 @@ class PostController {
         return res.send({ status: 'ok', payload: post })
 
     }
+
+    getByHash(req, res){
+        const {hash} = req.params
+        const posts = postModel.findByHash(hash)
+        return res.send({status:'ok', payload:posts})
+
+    }
 }
 
 export default new PostController()

@@ -297,6 +297,20 @@ router.delete('/posts/comment/:id', authMiddleware,  postController.handleDelete
  *         description: <code>{status:string, payload:IPost[]}</code>
  */
 router.get('/posts',authMiddleware, postController.getAll)
+
+/**
+ * @swagger
+ * /hashtag/:hash:
+ *   get:
+ *     summary: Retrieves all the posts including a given hashtag
+ *     description: 
+ *     tags:
+ *       - Resource
+ *     responses:
+ *       200:
+ *         description: <code>{status:string, payload:{IPost[], tags:string[]}</code>
+ */
+router.get('/hashtag/:hash',authMiddleware, postController.getByHash)
 /**
  * @swagger
  * /posts/:id:
