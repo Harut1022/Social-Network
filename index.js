@@ -31,7 +31,7 @@ const swaggerOptions = {
     info: {
       title: 'Social Network API',
       version: '1.0.0',
-      description: 'Social Network API for JavaScript Renaissance',
+      description: 'Social Network API for JavaScript EPIC!',
     },
   },
   apis: ['./routes/*.js'],

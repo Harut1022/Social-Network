@@ -8,8 +8,9 @@ import requestModel from '../models/request.js'
 import { loadUser } from '../lib/helpers.js'
 import likesModel from '../models/likes.js'
 import blockModel from '../models/block.js'
+import jwt from 'jsonwebtoken'
 
-
+const secret = '/22Zi1W7aQTWCbadcasz1FQ4Hq5lHF1d0rRII9mMs2o='
 class UserController {
     async signupHandler(req, res) {
         try {
@@ -26,7 +27,7 @@ class UserController {
                 error = 'Login is busy'
             }
             if (error) {
-                return res.send({ status: 'error', message: error })
+                return res.status(400).send({ status: 'error', message: error })
 
             } else {
                 req.body.password = await bcrypt.hash(req.body.password, 10)
@@ -38,8 +39,7 @@ class UserController {
             }
         }
         catch (err) {
-            console.log(err.message)
-            res.send({ status: 'error', message: "internal server error" })
+            res.status(500).send({ status: 'error', message: "internal server error: ", internal: err.message })
         }
     }
 
@@ -62,18 +62,22 @@ class UserController {
                 }
             }
             if (error) {
-                res.send({ status: 'error', message: error })
+                res.status(404).send({ status: 'error', message: error })
             } else if (found) {
-                let code = nanoid()
+                const token = jwt.sign(
+                    {
+                        id: found.id,
+                        name: found.name,
+                        surname: found.surname,
+                        isPrivate: found.isPrivate,
+                        cover: found.cover,
+                        picture: cover.picture
+                    },
+                    secret,
+                    { expiresIn: '1h' }
+                );
 
-                sessionModel.delete({ userId: found.id })
-                const result = sessionModel.insert({
-                    id: code,
-                    userId: found.id,
-                    expires: Date.now() + (20 * 60 * 1000)
-                })
-
-                res.cookie('token', code, { maxAge: 900000, httpOnly: false });
+                res.cookie('token', token, { maxAge: 900000, httpOnly: false, secure: true });
                 res.send({ status: 'ok' })
             }
 
@@ -89,8 +93,6 @@ class UserController {
     }
 
     async logoutHandler(req, res) {
-        const token = req.cookies.token
-        sessionModel.delete({ id: token })
         res.clearCookie('token')
         return res.send({ status: 'ok', user: null })
     }
@@ -101,10 +103,10 @@ class UserController {
         let found = userModel.findOne({ id: user.id })
         let result = await bcrypt.compare(old, found.password)
         if (!result) {
-            return res.send({ status: 'error', message: 'password is wrong' })
+            return res.status(400).send({ status: 'error', message: 'password is wrong' })
         } else {
             if (newpwd.length < 6) {
-                return res.send({ status: 'error', message: 'password is too short' })
+                return res.status(400).send({ status: 'error', message: 'password is too short' })
             }
             let hash = await bcrypt.hash(newpwd, 10)
             userModel.update({ id: user.id }, { password: hash })
@@ -119,11 +121,11 @@ class UserController {
         let found = userModel.findOne({ id: user.id })
         let result = await bcrypt.compare(password, found.password)
         if (!result) {
-            return res.send({ status: 'error', message: 'password is wrong' })
+            return res.status(404).send({ status: 'error', message: 'password is wrong' })
         } else {
             let exists = userModel.findOne({ login })
             if (exists) {
-                return res.send({ status: 'error', message: 'login is already taken' })
+                return res.status(400).send({ status: 'error', message: 'login is already taken' })
             }
 
             userModel.update({ id: user.id }, { login })
@@ -132,6 +134,9 @@ class UserController {
     }
     async profilePictureHandler(req, res) {
         const { filename } = req.file
+        if (!filename) {
+            return res.status(400).json({ status: 'error', message: 'bad request' })
+        }
         let source = '/images/' + filename
         const user = req.user.id
         userModel.update({ id: user }, { picture: source })
@@ -141,6 +146,9 @@ class UserController {
 
     async coverPictureHandler(req, res) {
         const { filename } = req.file
+        if (!filename) {
+            return res.status(400).json({ status: 'error', message: 'bad request' })
+        }
         let source = '/images/' + filename
         const user = req.user.id
         userModel.update({ id: user }, { cover: source })
@@ -160,7 +168,7 @@ class UserController {
         const user = req.user.id
 
         if (user == id) {
-            return res.send({ status: 'error', message: 'you can not observe your own account' })
+            return res.send({ status: 'error', message: 'you cannot observe your own account' })
         }
         if (result) {
             const amIFollowing = followModel.findOne({ userId: user, follows: id })
@@ -243,11 +251,11 @@ class UserController {
         const { id } = req.params
         const user = req.user.id
         if (user == id) {
-            return res.send({ status: 'error', message: 'you can not follow yourself' })
+            return res.status(400).send({ status: 'error', message: 'you can not follow yourself' })
         }
         let found = followModel.findOne({ userId: user, follows: id })
         if (found) {
-            return res.send({ status: 'error', message: 'already following' })
+            return res.status(400).send({ status: 'error', message: 'already following' })
         }
 
         const them = userModel.findOne({ id })
@@ -266,11 +274,11 @@ class UserController {
         const { id } = req.params
         const user = req.user.id
         if (user == id) {
-            return res.send({ status: 'error', message: 'you can not unfollow yourself' })
+            return res.status(400).send({ status: 'error', message: 'you ca not unfollow yourself' })
         }
         let found = followModel.findOne({ userId: user, follows: id })
         if (!found) {
-            return res.send({ status: 'error', message: 'you are not following this account' })
+            return res.status(400).send({ status: 'error', message: 'you are not following this account' })
         }
 
         followModel.delete({ userId: user, follows: id })
