@@ -69,10 +69,10 @@ class UserController {
                     {
                         id: found.id,
                         name: found.name,
-                        surname: found.surname,
+                        surname: found.surname, 
                         isPrivate: found.isPrivate,
                         cover: found.cover,
-                        picture: cover.picture
+                        picture: found.picture
                     },
                     secret,
                     { expiresIn: '1h' }
@@ -84,8 +84,7 @@ class UserController {
 
             //RESPONSE
         } catch (err) {
-            console.log(err.message)
-            res.send({ status: 'error', message: 'internal server error' })
+            res.send({ status: 'error', message: 'internal server error',internal:err.message })
         }
     }
 
