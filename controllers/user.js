@@ -10,6 +10,7 @@ import likesModel from '../models/likes.js'
 import blockModel from '../models/block.js'
 import jwt from 'jsonwebtoken'
 
+//it's better to put into .env as a seperate variable
 const secret = '/22Zi1W7aQTWCbadcasz1FQ4Hq5lHF1d0rRII9mMs2o='
 class UserController {
     async signupHandler(req, res) {
