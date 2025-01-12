@@ -399,7 +399,7 @@ router.get('/account/:id',authMiddleware, userController.getAccount)
  * @swagger
  * /account/follow/:id:
  *   post:
- *     summary: start following to the given user
+ *     summary: start following, unfollowing to the given user
  *     description: 
  *     tags:
  *       - Resource
@@ -423,22 +423,7 @@ router.post('/account/follow/:id', authMiddleware,  userController.follow)
  *         description: <code>{status:string,message?:string, payload:IUser}</code>
  *       
  */
-router.post('/account/unfollow/:id', authMiddleware,  userController.unfollow)
 
-/**
- * @swagger
- * /request/cancel/:id:
- *   delete:
- *     summary: cancels the request
- *     description: 
- *     tags:
- *       - Resource
- *     responses:
- *       200:
- *         description: <code>{status:string,message?:string, payload:IUser}</code>
- *       
- */
-router.delete('/request/cancel/:id', authMiddleware,  userController.cancelRequest)
 
 /**
  * @swagger

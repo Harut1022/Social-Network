@@ -69,7 +69,7 @@ class UserController {
                     {
                         id: found.id,
                         name: found.name,
-                        surname: found.surname, 
+                        surname: found.surname,
                         isPrivate: found.isPrivate,
                         cover: found.cover,
                         picture: found.picture
@@ -84,7 +84,7 @@ class UserController {
 
             //RESPONSE
         } catch (err) {
-            res.send({ status: 'error', message: 'internal server error',internal:err.message })
+            res.send({ status: 'error', message: 'internal server error', internal: err.message })
         }
     }
 
@@ -255,14 +255,21 @@ class UserController {
         }
         let found = followModel.findOne({ userId: user, follows: id })
         if (found) {
-            return res.status(400).send({ status: 'error', message: 'already following' })
+            followModel.delete({ userId: user, follows: id })
+            return res.send({ status: 'ok', message: 'unfolowed' })
         }
 
         const them = userModel.findOne({ id })
-        if (them.isPrivate) {
-            requestModel.insert({ userId: user, requests: id })
-            return res.send({ status: 'requested' })
+        const already = requestModel.findOne({userId:user, requests:id})
 
+        if (them.isPrivate) {
+            if(!already){
+                requestModel.insert({ userId: user, requests: id })
+                return res.send({ status: 'requested' })
+            }else{
+                requestModel.delete({ userId: user, requests: id })
+                return res.send({ status: 'cancelled' })
+            }
         }
 
         followModel.insert({ userId: user, follows: id })
