@@ -33,7 +33,6 @@ class UserController {
             } else {
                 req.body.password = await bcrypt.hash(req.body.password, 10)
                 const result = userModel.insert(req.body)
-                console.log(result)
                 if (result.changes) {
                     return res.send({ status: 'ok' })
                 }
