@@ -85,7 +85,7 @@ router.post('/login', userController.loginHandler)
  *       - Resource
  *     responses:
  *       200:
- *         description: <code>{status:string, message?:string, user:IUser|null}</code>
+ *         description: <code>{status:string, message?:string, payload:IUser}</code>
  */
 router.get('/verify',authMiddleware, userController.authHandler)
 
