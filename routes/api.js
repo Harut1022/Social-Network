@@ -99,7 +99,7 @@ router.get('/verify',authMiddleware, userController.authHandler)
  *       - Resource
  *     responses:
  *       200:
- *         description: <code>{status:string,message?:string, user:IUser|null}</code>
+ *         description: <code>{status:string,message?:string, payload:IUser|null}</code>
  *       
  */
 router.post('/logout', authMiddleware, userController.logoutHandler)
