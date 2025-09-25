@@ -88,12 +88,12 @@ class UserController {
     }
 
     async authHandler(req, res) {
-        res.send({ status: 'ok', user: req.user })
+        res.send({ status: 'ok', payload: req.user })
     }
 
     async logoutHandler(req, res) {
         res.clearCookie('token')
-        return res.send({ status: 'ok', user: null })
+        return res.send({ status: 'ok', payload: null })
     }
 
     async passwordUpdate(req, res) {
