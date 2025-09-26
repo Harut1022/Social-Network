@@ -97,38 +97,79 @@ class UserController {
     }
 
     async passwordUpdate(req, res) {
-        const { old, newpwd } = req.body
-        const user = req.user
-        let found = userModel.findOne({ id: user.id })
-        let result = await bcrypt.compare(old, found.password)
-        if (!result) {
-            return res.status(400).send({ status: 'error', message: 'password is wrong' })
-        } else {
-            if (newpwd.length < 6) {
-                return res.status(400).send({ status: 'error', message: 'password is too short' })
+        try {
+            const { oldPassword, newPassword } = req.body || {};
+
+            if (!oldPassword || !newPassword) {
+                return res.status(400).json({ status: 'error', message: 'Missing fields: oldPassword and newPassword are required.' });
             }
-            let hash = await bcrypt.hash(newpwd, 10)
-            userModel.update({ id: user.id }, { password: hash })
-            return res.send({ status: 'ok' })
+            if (typeof newPassword !== 'string' || newPassword.length < 8) {
+                return res.status(400).json({ status: 'error', message: 'Password must be at least 8 characters.' });
+            }
+
+            const userId = req.user?.id;
+            if (!userId) {
+                return res.status(401).json({ status: 'error', message: 'Unauthorized.' });
+            }
+
+            const user = userModel.findOne({ id: userId });
+            if (!user) {
+                return res.status(404).json({ status: 'error', message: 'User not found.' });
+            }
+
+            const matches = await bcrypt.compare(oldPassword, user.password);
+            if (!matches) {
+                return res.status(401).json({ status: 'error', message: 'Old password is incorrect.' });
+            }
+
+            const sameAsOld = await bcrypt.compare(newPassword, user.password);
+            if (sameAsOld) {
+                return res.status(400).json({ status: 'error', message: 'New password must be different from the old password.' });
+            }
+
+            const hash = await bcrypt.hash(newPassword, 12);
+            userModel.update({ id: userId }, { password: hash});
+
+            return res.status(200).json({ status: 'success', message: 'Password updated successfully.' });
+        } catch (err) {
+            return res.status(500).json({ status: 'error', message: 'Internal server error.' });
         }
 
     }
 
     async loginUpdate(req, res) {
-        const { login, password } = req.body
-        const user = req.user
-        let found = userModel.findOne({ id: user.id })
-        let result = await bcrypt.compare(password, found.password)
-        if (!result) {
-            return res.status(404).send({ status: 'error', message: 'password is wrong' })
-        } else {
-            let exists = userModel.findOne({ login })
-            if (exists) {
-                return res.status(400).send({ status: 'error', message: 'login is already taken' })
+        try {
+            const { newLogin, password } = req.body || {};
+
+            if (!newLogin || !password) {
+                return res.status(400).json({ status: 'error', message: 'Missing fields: newLogin and password are required.' });
             }
 
-            userModel.update({ id: user.id }, { login })
-            return res.send({ status: 'ok' })
+            const userId = req.user?.id;
+            if (!userId) {
+                return res.status(401).json({ status: 'error', message: 'Unauthorized.' });
+            }
+
+            const user =  userModel.findOne({ id: userId });
+            if (!user) {
+                return res.status(404).json({ status: 'error', message: 'User not found.' });
+            }
+
+            const matches = await bcrypt.compare(password, user.password);
+            if (!matches) {
+                return res.status(401).json({ status: 'error', message: 'Password is incorrect.' });
+            }
+
+            const exists = await userModel.findOne({ login: newLogin });
+            if (exists) {
+                return res.status(409).json({ status: 'error', message: 'Login is already taken.' });
+            }
+
+            userModel.update({ id: userId }, { login: newLogin });
+
+            return res.status(200).json({ status: 'success', message: 'Login updated successfully.' });
+        } catch (err) {
+            return res.status(500).json({ status: 'error', message: 'Internal server error.' });
         }
     }
     async profilePictureHandler(req, res) {
@@ -259,13 +300,13 @@ class UserController {
         }
 
         const them = userModel.findOne({ id })
-        const already = requestModel.findOne({userId:user, requests:id})
+        const already = requestModel.findOne({ userId: user, requests: id })
 
         if (them.isPrivate) {
-            if(!already){
+            if (!already) {
                 requestModel.insert({ userId: user, requests: id })
                 return res.send({ status: 'requested' })
-            }else{
+            } else {
                 requestModel.delete({ userId: user, requests: id })
                 return res.send({ status: 'cancelled' })
             }

@@ -108,8 +108,8 @@ router.post('/logout', authMiddleware, userController.logoutHandler)
  * @swagger
  * /update/password:
  *   patch:
- *     summary: update password
- *     description: This endpoint allows you to update your current password.
+ *     summary: Update user password
+ *     description: Allows an authenticated user to update their current password by providing the old and new passwords.
  *     tags:
  *       - Resource
  *     requestBody:
@@ -118,41 +118,95 @@ router.post('/logout', authMiddleware, userController.logoutHandler)
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - oldPassword
+ *               - newPassword
  *             properties:
- *               old:
+ *               oldPassword:
  *                 type: string
- *               newpwd:
+ *                 description: The current password of the user.
+ *                 example: OldPass123!
+ *               newPassword:
  *                 type: string
+ *                 description: The new password to set.
+ *                 example: NewPass456!
  *     responses:
  *       200:
- *         description: <code>{status:string,message?:string}</code>
- *       
+ *         description: Password updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Password updated successfully.
+ *       400:
+ *         description: Bad request (e.g., missing fields or invalid input).
+ *       401:
+ *         description: Unauthorized (e.g., incorrect old password or invalid token).
+ *       500:
+ *         description: Internal server error.
  */
+
 router.patch('/update/password', authMiddleware, userController.passwordUpdate)
 /**
  * @swagger
  * /update/login:
  *   patch:
- *     summary: update login
- *     description: This endpoint allows you to update your current login.
+ *     summary: Update user login (username/email)
+ *     description: Allows an authenticated user to change their current login by confirming their password.
  *     tags:
  *       - Resource
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - password
+ *               - newLogin
  *             properties:
  *               password:
  *                 type: string
- *               login:
+ *                 description: Current account password used to authorize the change.
+ *                 example: StrongPass123!
+ *               newLogin:
  *                 type: string
+ *                 description: The new unique login (e.g., username or email) to set.
+ *                 example: new.username or user.new@example.com
  *     responses:
  *       200:
- *         description: <code>{status:string,message?:string}</code>
- *       
+ *         description: Login updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Login updated successfully.
+ *       400:
+ *         description: Bad request (missing/invalid fields).
+ *       401:
+ *         description: Unauthorized (invalid token or wrong password).
+ *       409:
+ *         description: Conflict (new login already in use).
+ *       422:
+ *         description: Unprocessable Entity (login fails format/length rules).
+ *       500:
+ *         description: Internal server error.
  */
+
 router.patch('/update/login', authMiddleware, userController.loginUpdate)
 
 /**
