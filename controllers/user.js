@@ -128,7 +128,7 @@ class UserController {
             }
 
             const hash = await bcrypt.hash(newPassword, 12);
-            userModel.update({ id: userId }, { password: hash});
+            userModel.update({ id: userId }, { password: hash });
 
             return res.status(200).json({ status: 'success', message: 'Password updated successfully.' });
         } catch (err) {
@@ -150,7 +150,7 @@ class UserController {
                 return res.status(401).json({ status: 'error', message: 'Unauthorized.' });
             }
 
-            const user =  userModel.findOne({ id: userId });
+            const user = userModel.findOne({ id: userId });
             if (!user) {
                 return res.status(404).json({ status: 'error', message: 'User not found.' });
             }
@@ -201,6 +201,7 @@ class UserController {
         let result = userModel.fullText(text).map(e => e.omit('login', 'password'))
         res.send({ status: 'ok', payload: result })
     }
+
 
     getAccount(req, res) {
         const { id } = req.params
@@ -296,7 +297,7 @@ class UserController {
         let found = followModel.findOne({ userId: user, follows: id })
         if (found) {
             followModel.delete({ userId: user, follows: id })
-            return res.send({ status: 'ok', message: 'unfolowed' })
+            return res.send({ message: 'unfollowed' })
         }
 
         const them = userModel.findOne({ id })
@@ -305,15 +306,15 @@ class UserController {
         if (them.isPrivate) {
             if (!already) {
                 requestModel.insert({ userId: user, requests: id })
-                return res.send({ status: 'requested' })
+                return res.send({ message: 'requested' })
             } else {
                 requestModel.delete({ userId: user, requests: id })
-                return res.send({ status: 'cancelled' })
+                return res.send({ message: 'cancelled' })
             }
         }
 
         followModel.insert({ userId: user, follows: id })
-        return res.send({ status: 'following', payload: req.user.omit('login', 'password') })
+        return res.send({ status: 'following' })
 
 
     }
@@ -342,7 +343,7 @@ class UserController {
             return res.send({ status: 'error', message: 'no such request' })
         } else {
             requestModel.delete({ userId: me, requests: id })
-            return res.send({ status: 'cancelled' })
+            return res.send({ status: 'ok', message: 'cancelled' })
         }
     }
 
