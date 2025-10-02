@@ -314,7 +314,7 @@ class UserController {
         }
 
         followModel.insert({ userId: user, follows: id })
-        return res.send({ status: 'following' })
+        return res.send({ message: 'following' })
 
 
     }
@@ -330,7 +330,7 @@ class UserController {
         }
 
         followModel.delete({ userId: user, follows: id })
-        return res.send({ status: 'unfollowed', payload: req.user.omit('login', 'password') })
+        return res.send({ status: 'unfollowed' })
 
     }
 
