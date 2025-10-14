@@ -23,7 +23,7 @@ const __dirname = path.dirname(__filename);
 // app.use(cors());
 app.use(cors({
   credentials:true,
-  origin:["http://localhost:5173", "https://social-network2-er8m.onrender.com","http://localhost:5175","http://localhost:5176","http://10.67.70.35:5176"]
+  origin:["http://localhost:5173", "https://netflow.onrender.com","http://localhost:5175","http://localhost:5176","http://10.67.70.35:5176"]
 }))
 app.use(cookieParser())
 app.set('views', 'views')
