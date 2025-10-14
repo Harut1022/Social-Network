@@ -1,4 +1,5 @@
 front
 node_modules
 public
+social.db
 .DS_Store

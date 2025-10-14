@@ -11,7 +11,7 @@ import { fileURLToPath } from "url";
 
 import cookieParser from 'cookie-parser';
 const app = express();
-
+app.use(express.static('dist'));
 app.use(bodyParser.json()) // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form
 
@@ -21,10 +21,10 @@ const __dirname = path.dirname(__filename);
 
 
 // app.use(cors());
-// app.use(cors({
-//   credentials:true,
-//   origin:["http://localhost:5173", "https://social-network2-er8m.onrender.com","http://localhost:5175","http://localhost:5176","http://10.67.70.35:5176"]
-// }))
+app.use(cors({
+  credentials:true,
+  origin:["http://localhost:5173", "https://social-network2-er8m.onrender.com","http://localhost:5175","http://localhost:5176","http://10.67.70.35:5176"]
+}))
 app.use(cookieParser())
 app.set('views', 'views')
 app.set('view engine', 'ejs')
@@ -92,7 +92,7 @@ app.use((err, req, res, next) => {
   console.error('Error occurred:', err.message);
   res.status(500).json({ message: 'Internal Server Error' });
 });
-app.use(express.static(path.join(__dirname, 'dist')));
+
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
