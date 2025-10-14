@@ -31,7 +31,7 @@ app.use(cookieParser())
 app.set('views', 'views')
 app.set('view engine', 'ejs')
 app.use(express.static('dist'))
-const port = 443
+const port = 4002
 
 
 // Swagger set up
