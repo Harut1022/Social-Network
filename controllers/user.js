@@ -209,9 +209,10 @@ class UserController {
         const user = req.user.id
 
         if (user == id) {
-            return res.send({ status: 'error', message: 'you cannot observe your own account' })
+            return res.status(404).send({ status: 'error', message: 'you cannot observe your own account' })
         }
         if (result) {
+
             const amIFollowing = followModel.findOne({ userId: user, follows: id })
             const followsMe = followModel.findOne({ userId: id, follows: user })
             const requested = requestModel.findOne({ userId: user, requests: id })
@@ -397,17 +398,49 @@ class UserController {
     }
     getFollowers(req, res) {
         const { id } = req.user
-        const followers = followModel
-            .findWhere({ follows: id })
-            .map(loadUser)
+
+
+        const followers = followModel.findWhere({ follows: id }).map(loadUser)
+        followers.map(follower => {
+
+            const amIFollowing = followModel.findOne({ userId: id, follows: follower.id })
+            const followsMe = followModel.findOne({ userId: follower.id, follows: id })
+            const requested = requestModel.findOne({ userId: id, requests: follower.id })
+            //block
+            const amIBlocked = blockModel.findOne({ user: id, blocked: follower.id })
+            const heBlockedMe = blockModel.findOne({ user: follower.id, blocked: id })
+            follower.connection = {
+                following: Boolean(amIFollowing),
+                followsMe: Boolean(followsMe),
+                requested: Boolean(requested),
+                blockedMe: Boolean(heBlockedMe),
+                didIBlock: Boolean(amIBlocked)
+            }
+        })
+
+       
         return res.send({ status: 'ok', payload: followers })
     }
 
     getFollowings(req, res) {
         const { id } = req.user
-        const followers = followModel
-            .findWhere({ userId: id })
-            .map(x => loadUser(x, 'follows'))
+        const followers = followModel.findWhere({ userId: id }).map(x => loadUser(x, 'follows'))
+        followers.map(follower => {
+
+            const amIFollowing = followModel.findOne({ userId: id, follows: follower.id })
+            const followsMe = followModel.findOne({ userId: follower.id, follows: id })
+            const requested = requestModel.findOne({ userId: id, requests: follower.id })
+            //block
+            const amIBlocked = blockModel.findOne({ user: id, blocked: follower.id })
+            const heBlockedMe = blockModel.findOne({ user: follower.id, blocked: id })
+            follower.connection = {
+                following: Boolean(amIFollowing),
+                followsMe: Boolean(followsMe),
+                requested: Boolean(requested),
+                blockedMe: Boolean(heBlockedMe),
+                didIBlock: Boolean(amIBlocked)
+            }
+        })
 
         return res.send({ status: 'ok', payload: followers })
     }

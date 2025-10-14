@@ -13,17 +13,18 @@ app.use(bodyParser.json()) // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form
 
 
-app.use(cors({
-  credentials:true,
-  origin:["http://localhost:5173", "http://localhost:5174"]
-}))
+// app.use(cors());
+// app.use(cors({
+//   credentials:true,
+//   origin:["http://localhost:5173", "https://social-network2-er8m.onrender.com","http://localhost:5175","http://localhost:5176","http://10.67.70.35:5176"]
+// }))
 app.use(cookieParser())
 app.set('views', 'views')
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
-const port = 4002
+const port = 443
 
-
+// app.use(express.static("Home"))
 // Swagger set up
 const swaggerOptions = {
   swaggerDefinition: {
@@ -86,7 +87,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start the server
-app.listen(port, () => {
+app.listen(port,"0.0.0.0", () => {
   console.log(`Server running at http://localhost:${port}`);
 });
 
