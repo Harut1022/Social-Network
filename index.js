@@ -18,9 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // 👉 catch-all route for React Router
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
-});
+
 
 // app.use(cors());
 // app.use(cors({
@@ -30,7 +28,7 @@ app.get("*", (req, res) => {
 app.use(cookieParser())
 app.set('views', 'views')
 app.set('view engine', 'ejs')
-app.use(express.static('dist'))
+
 const port = 4002
 
 
@@ -94,7 +92,10 @@ app.use((err, req, res, next) => {
   console.error('Error occurred:', err.message);
   res.status(500).json({ message: 'Internal Server Error' });
 });
-
+app.use(express.static(path.join(__dirname, 'dist')));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
 // Start the server
 app.listen(port,"0.0.0.0", () => {
   console.log(`Server running at http://localhost:${port}`);
