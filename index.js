@@ -6,12 +6,21 @@ import bodyParser from 'body-parser'
 import model from './models/init.js'
 import './lib/helpers.js'
 import cors from 'cors'
+import path from "path";
+import { fileURLToPath } from "url";
+
 import cookieParser from 'cookie-parser';
 const app = express();
 
 app.use(bodyParser.json()) // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// 👉 catch-all route for React Router
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
 
 // app.use(cors());
 // app.use(cors({
@@ -24,7 +33,7 @@ app.set('view engine', 'ejs')
 app.use(express.static('dist'))
 const port = 443
 
-// app.use(express.static("Home"))
+
 // Swagger set up
 const swaggerOptions = {
   swaggerDefinition: {
