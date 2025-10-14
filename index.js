@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-
 app.use(cookieParser())
 app.set('views', 'views')
 app.set('view engine', 'ejs')
-app.use(express.static('public'))
+app.use(express.static('dist'))
 const port = 443
 
 // app.use(express.static("Home"))
