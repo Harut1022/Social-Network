@@ -26,7 +26,7 @@ app.use(cors({
   origin:["http://localhost:5173", "https://netflow.onrender.com","http://localhost:5175","http://localhost:5176","http://10.67.70.35:5176"]
 }))
 
-
+app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(cookieParser())
 app.set('views', 'views')
 app.set('view engine', 'ejs')
